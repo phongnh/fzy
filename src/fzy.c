@@ -33,7 +33,13 @@ int main(int argc, char *argv[]) {
 	} else if (options.filter) {
 		choices_fread(&choices, stdin, options.input_delimiter);
 		choices_search(&choices, options.filter);
-		for (size_t i = 0; i < choices_available(&choices); i++) {
+
+		size_t num_of_matches = choices_available(&choices);
+		if (options.num_matches > 0 && options.num_matches < num_of_matches) {
+			num_of_matches = options.num_matches;
+		}
+
+		for (size_t i = 0; i < num_of_matches; i++) {
 			if (options.show_scores)
 				printf("%f\t", choices_getscore(&choices, i));
 			printf("%s\n", choices_get(&choices, i));

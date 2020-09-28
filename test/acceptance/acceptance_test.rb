@@ -464,6 +464,7 @@ Usage: fzy [OPTION]...
  -p, --prompt=PROMPT      Input prompt (default '> ')
  -q, --query=QUERY        Use QUERY as the initial search string
  -e, --show-matches=QUERY Output the sorted matches of QUERY
+ -m, --num-of-matches=NUM Output the NUM of the sorted matches of QUERY
  -t, --tty=TTY            Specify file to use as TTY device (default /dev/tty)
  -s, --show-scores        Show the scores of each match
  -0, --read-null          Read input delimited by ASCII NUL characters

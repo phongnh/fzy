@@ -15,6 +15,7 @@ static const char *usage_str =
     " -p, --prompt=PROMPT      Input prompt (default '> ')\n"
     " -q, --query=QUERY        Use QUERY as the initial search string\n"
     " -e, --show-matches=QUERY Output the sorted matches of QUERY\n"
+    " -m, --num-of-matches=NUM Output only the NUM of the sorted matches of QUERY\n"
     " -t, --tty=TTY            Specify file to use as TTY device (default /dev/tty)\n"
     " -s, --show-scores        Show the scores of each match\n"
     " -0, --read-null          Read input delimited by ASCII NUL characters\n"
@@ -28,6 +29,7 @@ static void usage(const char *argv0) {
 }
 
 static struct option longopts[] = {{"show-matches", required_argument, NULL, 'e'},
+                                   {"num-of-matches", required_argument, NULL, 'm'},
 				   {"query", required_argument, NULL, 'q'},
 				   {"lines", required_argument, NULL, 'l'},
 				   {"tty", required_argument, NULL, 't'},
@@ -45,6 +47,7 @@ void options_init(options_t *options) {
 	/* set defaults */
 	options->benchmark       = 0;
 	options->filter          = NULL;
+	options->num_matches     = DEFAULT_NUM_MATCHES;
 	options->init_search     = NULL;
 	options->show_scores     = 0;
 	options->scrolloff       = 1;
@@ -60,7 +63,7 @@ void options_parse(options_t *options, int argc, char *argv[]) {
 	options_init(options);
 
 	int c;
-	while ((c = getopt_long(argc, argv, "vhs0e:q:l:t:p:j:i", longopts, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "vhs0e:m:q:l:t:p:j:i", longopts, NULL)) != -1) {
 		switch (c) {
 			case 'v':
 				printf("%s " VERSION " © 2014-2018 John Hawthorn\n", argv[0]);
@@ -77,6 +80,18 @@ void options_parse(options_t *options, int argc, char *argv[]) {
 			case 'e':
 				options->filter = optarg;
 				break;
+			case 'm': {
+				int m;
+				if (!strcmp(optarg, "max")) {
+					m = INT_MAX;
+				} else if (sscanf(optarg, "%d", &m) != 1 || m < 0) {
+					fprintf(stderr, "Invalid format for --num-of-matches: %s\n", optarg);
+					fprintf(stderr, "Must be integer in range 0..\n");
+					usage(argv[0]);
+					exit(EXIT_FAILURE);
+				}
+				options->num_matches = m;
+			} break;
 			case 'b':
 				if (optarg) {
 					if (sscanf(optarg, "%d", &options->benchmark) != 1) {
